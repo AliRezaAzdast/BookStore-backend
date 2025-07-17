@@ -1,8 +1,10 @@
 const http = require("http");
 const fs = require("fs");
+const url = require("url");
+const db = require("./db.json");
 
 const server = http.createServer((req, res) => {
-  // api to see users
+  // Get list of users
   if (req.url === "/api/users" && req.method === "GET") {
     fs.readFile("db.json", (err, db) => {
       if (err) {
@@ -17,8 +19,8 @@ const server = http.createServer((req, res) => {
     });
   }
 
-  // api to see books
-  if (req.url === "/api/books" && req.method === "GET") {
+  // Get list of books
+  else if (req.url === "/api/books" && req.method === "GET") {
     fs.readFile("db.json", (err, db) => {
       if (err) {
         throw err;
@@ -29,6 +31,37 @@ const server = http.createServer((req, res) => {
         res.write(JSON.stringify(data.books));
         res.end();
       }
+    });
+  }
+
+  // Delete a book by id
+  else if (req.method === "DELETE") {
+    const parseUrl = url.parse(req.url, true);
+    const bookId = parseUrl.query.id;
+
+    // Check if the book with the given id exists
+    const bookExists = db.books.some((book) => book.id == bookId);
+
+    if (!bookExists) {
+      // If not found, return 404 error
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ error: "Book not found" }));
+      return res.end();
+    }
+
+    // If found, remove the book from the list
+    const newBooks = db.books.filter((book) => book.id != bookId);
+
+    // Write the updated data back to the file
+    fs.writeFile("db.json", JSON.stringify({ ...db, books: newBooks }), (err) => {
+      if (err) {
+        throw err;
+      }
+
+      // Return success response
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ message: "Book removed successfully" }));
+      res.end();
     });
   }
 });

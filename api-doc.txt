@@ -1,0 +1,16 @@
+API doc
+====================
+
+Base URL: http://localhost:3000
+
+-------------------------
+GET /api/users
+Description: Returns the list of all users.
+
+-------------------------
+GET /api/books
+
+Description: Returns the list of all books.
+
+For deleting book from list :
+DELETE /?id={bookId}
