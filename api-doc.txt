@@ -3,14 +3,26 @@ API doc
 
 Base URL: http://localhost:3000
 
--------------------------
-GET /api/users
-Description: Returns the list of all users.
+======================
+api url : /api/users
 
--------------------------
-GET /api/books
+Description: Returns the list of all users.
+GET 
+
+=====================
+api url: /api/books
 
 Description: Returns the list of all books.
+GET 
+
 
 For deleting book from list :
-DELETE /?id={bookId}
+DELETE: ?id={bookId}
+
+For adding new Book:
+POST: 
+{
+    "title": "name",
+    "author": "name",
+    "price": 200000
+}

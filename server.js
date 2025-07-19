@@ -9,13 +9,12 @@ const server = http.createServer((req, res) => {
     fs.readFile("db.json", (err, db) => {
       if (err) {
         throw err;
-      } else {
-        const data = JSON.parse(db);
-
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(JSON.stringify(data.users));
-        res.end();
       }
+      const data = JSON.parse(db);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write(JSON.stringify(data.users));
+      res.end();
     });
   }
 
@@ -24,18 +23,17 @@ const server = http.createServer((req, res) => {
     fs.readFile("db.json", (err, db) => {
       if (err) {
         throw err;
-      } else {
-        const data = JSON.parse(db);
-
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(JSON.stringify(data.books));
-        res.end();
       }
+      const data = JSON.parse(db);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write(JSON.stringify(data.books));
+      res.end();
     });
   }
 
   // Delete a book by id
-  else if (req.method === "DELETE") {
+  else if (req.method === "DELETE" && req.url.startsWith("/api/books")) {
     const parseUrl = url.parse(req.url, true);
     const bookId = parseUrl.query.id;
 
@@ -53,15 +51,41 @@ const server = http.createServer((req, res) => {
     const newBooks = db.books.filter((book) => book.id != bookId);
 
     // Write the updated data back to the file
-    fs.writeFile("db.json", JSON.stringify({ ...db, books: newBooks }), (err) => {
-      if (err) {
-        throw err;
-      }
+    fs.writeFile(
+      "db.json",
+      JSON.stringify({ ...db, books: newBooks }),
+      (err) => {
+        if (err) {
+          throw err;
+        }
 
-      // Return success response
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.write(JSON.stringify({ message: "Book removed successfully" }));
-      res.end();
+        // Return success response
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "Book removed successfully" }));
+        res.end();
+      }
+    );
+  } else if (req.method === "POST" && req.url === "/api/books") {
+    let book = "";
+
+    req.on("data", (data) => {
+      book = book + data.toString();
+    });
+    req.on("end", () => {
+      const newBook = {
+        id: crypto.randomUUID(),
+        ...JSON.parse(book),
+        free: 1,
+      };
+      db.books.push(newBook);
+      fs.writeFile("db.json", JSON.stringify(db), (err) => {
+        if (err) {
+          throw err;
+        }
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "New Book Added successfully" }));
+        res.end();
+      });
     });
   }
 });
