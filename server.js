@@ -97,9 +97,20 @@ const server = http.createServer((req, res) => {
     const parseUrl = url.parse(req.url, true);
     const bookId = parseUrl.query.id;
 
-    
     let bookNewInfo = "";
 
+
+    // Check if the book with the given id exists
+    const bookExists = db.books.some((book) => book.id == bookId);
+
+    if (!bookExists) {
+      // If not found, return 404 error
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ error: "Book not found" }));
+      return res.end();
+    }
+
+    
     req.on("data", (data) => {
       bookNewInfo = bookNewInfo + data.toString();
     });

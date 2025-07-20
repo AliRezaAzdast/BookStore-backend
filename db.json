@@ -25,9 +25,9 @@
   "books": [
     {
       "id": 1,
-      "title": "Golestan",
-      "author": "Sadi",
-      "price": 230000,
+      "title": "David Goggins",
+      "author": "Can't hurt me",
+      "price": 150000,
       "free": 0
     },
     {
