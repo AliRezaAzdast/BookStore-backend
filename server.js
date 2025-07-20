@@ -65,7 +65,10 @@ const server = http.createServer((req, res) => {
         res.end();
       }
     );
-  } else if (req.method === "POST" && req.url === "/api/books") {
+  }
+
+  // Add new book
+  else if (req.method === "POST" && req.url === "/api/books") {
     let book = "";
 
     req.on("data", (data) => {
@@ -84,6 +87,41 @@ const server = http.createServer((req, res) => {
         }
         res.writeHead(201, { "Content-Type": "application/json" });
         res.write(JSON.stringify({ message: "New Book Added successfully" }));
+        res.end();
+      });
+    });
+  }
+
+  // Edit a Book
+  else if (req.method === "PUT" && req.url.startsWith("/api/books")) {
+    const parseUrl = url.parse(req.url, true);
+    const bookId = parseUrl.query.id;
+
+    
+    let bookNewInfo = "";
+
+    req.on("data", (data) => {
+      bookNewInfo = bookNewInfo + data.toString();
+    });
+
+    req.on("end", () => {
+      const reqBody = JSON.parse(bookNewInfo);
+
+      db.books.forEach((book) => {
+        if (book.id === Number(bookId)) {
+          book.title = reqBody.title;
+          book.author = reqBody.author;
+          book.price = reqBody.price;
+        }
+      });
+
+      fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+        if (err) {
+          throw err;
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "book change successfully" }));
         res.end();
       });
     });

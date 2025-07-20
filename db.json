@@ -32,16 +32,16 @@
     },
     {
       "id": 2,
-      "title": "Boostan",
-      "author": "Sadi",
-      "price": 400000,
+      "title": "48 rules of power",
+      "author": "Robert Green",
+      "price": 300000,
       "free": 1
     },
     {
-      "id": "6017108a-db49-4c0a-ad04-4730d09637d2",
-      "title": "gamer.com",
-      "author": "gg",
-      "price": 200000,
+      "id": 3,
+      "title": "Mastery",
+      "author": "Robert Green",
+      "price": 150000,
       "free": 1
     }
   ]

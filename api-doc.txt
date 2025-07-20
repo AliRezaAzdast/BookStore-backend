@@ -26,3 +26,12 @@ POST:
     "author": "name",
     "price": 200000
 }
+
+
+For editing a book in data base:
+PUT: ?id={bookId}
+{
+    "title": "name",
+    "author": "name",
+    "price": 200000
+}

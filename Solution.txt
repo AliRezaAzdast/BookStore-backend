@@ -4,4 +4,4 @@ User (Entity)
 
 
 Book 
-    AddBook, removeBook, EditBook
+    ✅AddBook, ✅removeBook, ✅EditBook
