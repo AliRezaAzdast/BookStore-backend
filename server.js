@@ -44,7 +44,38 @@ const server = http.createServer((req, res) => {
         }
 
         res.writeHead(201, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: 'User register successfully'}));
+        res.write(JSON.stringify({ message: "User register successfully" }));
+        res.end();
+      });
+    });
+  } else if (req.method === "PUT" && req.url.startsWith("/api/users")) {
+    const parseUrl = url.parse(req.url, true);
+    const userId = parseUrl.query.id;
+
+    let updatedUser = "";
+
+    req.on("data", (data) => {
+      updatedUser = updatedUser + data.toString();
+    });
+
+    req.on("end", () => {
+      const { crime } = JSON.parse(updatedUser);
+
+      db.users.forEach((user) => {
+        if (user.id === Number(userId)) {
+          user.crime = crime;
+        }
+      });
+
+      fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+        if (err) {
+          throw err;
+        }
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(
+          JSON.stringify({ message: "User crime updated successfully" })
+        );
         res.end();
       });
     });

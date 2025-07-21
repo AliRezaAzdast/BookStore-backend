@@ -18,6 +18,12 @@ POST
     "gmail": "gmail"
 }
 
+Update crime of user:
+PUT ?id=*
+{
+    "crime": 20000
+}
+
 =====================
 api url: /api/books
 
