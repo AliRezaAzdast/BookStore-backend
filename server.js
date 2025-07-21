@@ -5,7 +5,7 @@ const db = require("./db.json");
 
 const server = http.createServer((req, res) => {
   // Get list of users
-  if (req.url === "/api/users" && req.method === "GET") {
+  if (req.method === "GET" && req.url === "/api/users") {
     fs.readFile("db.json", (err, db) => {
       if (err) {
         throw err;
@@ -17,9 +17,41 @@ const server = http.createServer((req, res) => {
       res.end();
     });
   }
+  // Add user
+  else if (req.method === "POST" && req.url === "/api/users") {
+    let NewUserInfo = "";
+
+    req.on("data", (data) => {
+      NewUserInfo = NewUserInfo + data.toString();
+    });
+
+    req.on("end", () => {
+      const { name, username, gmail } = JSON.parse(NewUserInfo);
+      const newUser = {
+        id: crypto.randomUUID(),
+        name,
+        username,
+        gmail,
+        crime: 0,
+        role: "USER",
+      };
+
+      db.users.push(newUser);
+
+      fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+        if (err) {
+          throw err;
+        }
+
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: 'User register successfully'}));
+        res.end();
+      });
+    });
+  }
 
   // Get list of books
-  else if (req.url === "/api/books" && req.method === "GET") {
+  else if (req.method === "GET" && req.url === "/api/books") {
     fs.readFile("db.json", (err, db) => {
       if (err) {
         throw err;
@@ -99,7 +131,6 @@ const server = http.createServer((req, res) => {
 
     let bookNewInfo = "";
 
-
     // Check if the book with the given id exists
     const bookExists = db.books.some((book) => book.id == bookId);
 
@@ -110,7 +141,6 @@ const server = http.createServer((req, res) => {
       return res.end();
     }
 
-    
     req.on("data", (data) => {
       bookNewInfo = bookNewInfo + data.toString();
     });

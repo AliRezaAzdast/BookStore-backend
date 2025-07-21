@@ -6,8 +6,17 @@ Base URL: http://localhost:3000
 ======================
 api url : /api/users
 
-Description: Returns the list of all users.
+Returns the list of all users.
 GET 
+
+
+Add user:
+POST 
+{
+    "name": "name",
+    "username": "username",
+    "gmail": "gmail"
+}
 
 =====================
 api url: /api/books
