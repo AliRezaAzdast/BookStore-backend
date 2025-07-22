@@ -24,6 +24,10 @@ PUT ?id=*
     "crime": 20000
 }
 
+Update user to admin:
+PUT update?id=*
+
+
 =====================
 api url: /api/books
 

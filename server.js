@@ -68,6 +68,27 @@ const server = http.createServer((req, res) => {
       }
     });
   }
+  // make user admin
+  else if (req.method === "PUT" && req.url.startsWith("/api/users/update")) {
+    const parseUrl = url.parse(req.url, true);
+    const userId = parseUrl.query.id;
+
+    db.users.forEach((user) => {
+      if (user.id === Number(userId)) {
+        user.role = "ADMIN";
+      }
+    });
+
+    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+      if (err) {
+        throw err;
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ message: "user updated to admin" }));
+      res.end();
+    });
+  }
   // User crime update
   else if (req.method === "PUT" && req.url.startsWith("/api/users")) {
     const parseUrl = url.parse(req.url, true);
