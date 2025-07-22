@@ -27,28 +27,49 @@ const server = http.createServer((req, res) => {
 
     req.on("end", () => {
       const { name, username, gmail } = JSON.parse(NewUserInfo);
-      const newUser = {
-        id: crypto.randomUUID(),
-        name,
-        username,
-        gmail,
-        crime: 0,
-        role: "USER",
-      };
-
-      db.users.push(newUser);
-
-      fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-        if (err) {
-          throw err;
-        }
-
-        res.writeHead(201, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: "User register successfully" }));
+      const isUserExist = db.users.find(
+        (user) => user.gmail === gmail || user.username === username
+      );
+      //cheak if data is empty
+      if (name === "" || username === "" || gmail === "") {
+        res.writeHead(422, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "User Data are not valid" }));
         res.end();
-      });
+      }
+      // cheack if the use exist
+      else if (isUserExist) {
+        res.writeHead(409, { "Content-Type": "application/json" });
+        res.write(
+          JSON.stringify({ message: "Email or Username alredy exist" })
+        );
+        res.end();
+      }
+      // make user if there is no problem
+      else {
+        const newUser = {
+          id: crypto.randomUUID(),
+          name,
+          username,
+          gmail,
+          crime: 0,
+          role: "USER",
+        };
+        db.users.push(newUser);
+
+        fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+          if (err) {
+            throw err;
+          }
+
+          res.writeHead(201, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "User register successfully" }));
+          res.end();
+        });
+      }
     });
-  } else if (req.method === "PUT" && req.url.startsWith("/api/users")) {
+  }
+  // User crime update
+  else if (req.method === "PUT" && req.url.startsWith("/api/users")) {
     const parseUrl = url.parse(req.url, true);
     const userId = parseUrl.query.id;
 
