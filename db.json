@@ -1,74 +1,74 @@
 {
-  "users": [
-    {
-      "id": 1,
-      "name": "Amin Saeedi",
-      "username": "01010101",
-      "gmail": "test@gmail.com",
-      "crime": 0,
-      "role": "ADMIN"
-    },
-    {
-      "id": 2,
-      "name": "Qadir Yolme",
-      "username": "Q_Yolme",
-      "gmail": "test@gmail.com",
-      "crime": 0,
-      "role": "ADMIN"
-    },
-    {
-      "id": 3,
-      "name": "Ehsan Mmdi",
-      "username": "ehs",
-      "gmail": "test@gmail.com",
-      "crime": 20000,
-      "role": "USER"
-    },
-    {
-      "id": 4,
-      "name": "Ali reza",
-      "username": "Azdast",
-      "gmail": "azdast47@gmail.com",
-      "role": "ADMIN"
-    },
-    {
-      "id": 5,
-      "name": "ali",
-      "username": "mohammad",
-      "gmail": "azdast48@gmail.com",
-      "crime": 0,
-      "role": "USER"
-    },
-    {
-      "id": 6,
-      "name": "ali",
-      "username": "a",
-      "gmail": "azdast49@gmail.com",
-      "crime": 0,
-      "role": "USER"
-    }
-  ],
-  "books": [
-    {
-      "id": 1,
-      "title": "David Goggins",
-      "author": "Can't hurt me",
-      "price": 150000,
-      "free": 0
-    },
-    {
-      "id": 2,
-      "title": "48 rules of power",
-      "author": "Robert Green",
-      "price": 300000,
-      "free": 1
-    },
-    {
-      "id": 3,
-      "title": "Mastery",
-      "author": "Robert Green",
-      "price": 150000,
-      "free": 1
-    }
-  ]
+    "users": [
+        {
+            "id": 1,
+            "name": "Amin Saeedi",
+            "username": "01010101",
+            "gmail": "test@gmail.com",
+            "crime": 0,
+            "role": "ADMIN"
+        },
+        {
+            "id": 2,
+            "name": "Qadir Yolme",
+            "username": "Q_Yolme",
+            "gmail": "test@gmail.com",
+            "crime": 0,
+            "role": "ADMIN"
+        },
+        {
+            "id": 3,
+            "name": "Ehsan Mmdi",
+            "username": "ehs",
+            "gmail": "test@gmail.com",
+            "crime": 20000,
+            "role": "USER"
+        },
+        {
+            "id": 4,
+            "name": "Ali reza",
+            "username": "Azdast",
+            "gmail": "azdast47@gmail.com",
+            "role": "ADMIN"
+        },
+        {
+            "id": 5,
+            "name": "ali",
+            "username": "mohammad",
+            "gmail": "azdast48@gmail.com",
+            "crime": 0,
+            "role": "USER"
+        },
+        {
+            "id": 6,
+            "name": "ali",
+            "username": "a",
+            "gmail": "azdast49@gmail.com",
+            "crime": 0,
+            "role": "USER"
+        }
+    ],
+    "books": [
+        {
+            "id": 1,
+            "title": "David Goggins",
+            "author": "Can't hurt me",
+            "price": 150000,
+            "free": 0
+        },
+        {
+            "id": 2,
+            "title": "48 rules of power",
+            "author": "Robert Green",
+            "price": 300000,
+            "free": 1
+        },
+        {
+            "id": 3,
+            "title": "Mastery",
+            "author": "Robert Green",
+            "price": 150000,
+            "free": 1
+        }
+    ]
 }

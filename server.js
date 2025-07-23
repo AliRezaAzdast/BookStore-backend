@@ -17,6 +17,31 @@ const server = http.createServer((req, res) => {
       res.end();
     });
   }
+  // for user login
+  else if (req.method === "POST" && req.url === "/api/users/login") {
+    let user = "";
+
+    req.on("data", (data) => {
+      user = user + data.toString();
+    });
+
+    req.on("end", () => {
+      const { username, gmail } = JSON.parse(user);
+      const mainUser = db.users.find(
+        (user) => user.username === username && user.gmail === gmail
+      );
+
+      if(mainUser){
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "User has logedin" }));
+        res.end();
+      } else {
+        res.writeHead(401, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "User not found" }));
+        res.end();
+      }
+    });
+  }
   // Add user
   else if (req.method === "POST" && req.url === "/api/users") {
     let NewUserInfo = "";
