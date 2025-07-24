@@ -1,14 +1,6 @@
 {
     "users": [
         {
-            "id": 1,
-            "name": "Amin Saeedi",
-            "username": "01010101",
-            "gmail": "test@gmail.com",
-            "crime": 0,
-            "role": "ADMIN"
-        },
-        {
             "id": 2,
             "name": "Qadir Yolme",
             "username": "Q_Yolme",
@@ -32,18 +24,18 @@
             "role": "ADMIN"
         },
         {
-            "id": 5,
-            "name": "ali",
-            "username": "mohammad",
-            "gmail": "azdast48@gmail.com",
-            "crime": 0,
-            "role": "USER"
-        },
-        {
             "id": 6,
             "name": "ali",
             "username": "a",
             "gmail": "azdast49@gmail.com",
+            "crime": 0,
+            "role": "USER"
+        },
+        {
+            "id": 7,
+            "name": "sepehr",
+            "username": "king",
+            "gmail": "king@gmail.com",
             "crime": 0,
             "role": "USER"
         }
@@ -61,7 +53,7 @@
             "title": "48 rules of power",
             "author": "Robert Green",
             "price": 300000,
-            "free": 1
+            "free": 0
         },
         {
             "id": 3,
@@ -69,6 +61,25 @@
             "author": "Robert Green",
             "price": 150000,
             "free": 1
+        },
+        {
+            "id": 4,
+            "title": "how to win firends & influence people",
+            "author": "Dale Carnegie",
+            "price": 150000,
+            "free": 1
+        }
+    ],
+    "rents": [
+        {
+            "id": 1,
+            "userId": 1,
+            "bookId": 2
+        },
+        {
+            "id": 2,
+            "userId": 2,
+            "bookId": 2
         }
     ]
 }

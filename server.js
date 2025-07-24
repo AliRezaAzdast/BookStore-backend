@@ -31,7 +31,7 @@ const server = http.createServer((req, res) => {
         (user) => user.username === username && user.gmail === gmail
       );
 
-      if(mainUser){
+      if (mainUser) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.write(JSON.stringify({ message: "User has logedin" }));
         res.end();
@@ -71,8 +71,10 @@ const server = http.createServer((req, res) => {
       }
       // make user if there is no problem
       else {
+        // return the highest value id in data base 
+        const lastId = db.users.reduce((max, book) => book.id > max ? book.id : max, 0);
         const newUser = {
-          id: crypto.randomUUID(),
+          id: lastId + 1,
           name,
           username,
           gmail,
@@ -205,8 +207,10 @@ const server = http.createServer((req, res) => {
       book = book + data.toString();
     });
     req.on("end", () => {
+      // return the highest value id in data base 
+      const lastId = db.books.reduce((max, book) => book.id > max ? book.id : max, 0);
       const newBook = {
-        id: crypto.randomUUID(),
+        id: lastId + 1,
         ...JSON.parse(book),
         free: 1,
       };
@@ -263,6 +267,54 @@ const server = http.createServer((req, res) => {
         res.write(JSON.stringify({ message: "book change successfully" }));
         res.end();
       });
+    });
+  }
+  // renting book
+  else if (req.method === "POST" && req.url === "/api/books/rent") {
+    let reqBody = "";
+
+    req.on("data", (data) => {
+      reqBody = reqBody + data.toString();
+    });
+
+    req.on("end", () => {
+      let { userId, bookId } = JSON.parse(reqBody);
+      console.log(bookId)
+
+      const isFreeBook = db.books.some(
+        (book) => book.id === bookId && book.free === 1
+      );
+
+      if (isFreeBook) {
+
+        db.books.forEach(book => {
+          if(book.id === Number(bookId)){
+            book.free = 0;
+          }
+        })
+        // return the highest value id in data base 
+        const lastId = db.rents.reduce((max, book) => book.id > max ? book.id : max, 0);
+        const newRent = {
+          id: lastId + 1,
+          userId,
+          bookId,
+        };
+
+        db.rents.push(newRent);
+
+        fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+          if (err) {
+            throw err;
+          }
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "book has rented" }));
+          res.end();
+        });
+      } else {
+        res.writeHead(301, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "book not available" }));
+        res.end();
+      }
     });
   }
 });

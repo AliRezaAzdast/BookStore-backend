@@ -54,3 +54,13 @@ PUT: ?id={bookId}
     "author": "name",
     "price": 200000
 }
+
+=====================
+api url : /api/rent
+
+for renting a book :
+POST
+{
+    "userId": id,
+    "bookID": id,
+}
