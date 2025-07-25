@@ -53,7 +53,7 @@
             "title": "48 rules of power",
             "author": "Robert Green",
             "price": 300000,
-            "free": 0
+            "free": 1
         },
         {
             "id": 3,
@@ -72,14 +72,14 @@
     ],
     "rents": [
         {
-            "id": 1,
+            "id": 4,
             "userId": 1,
-            "bookId": 2
+            "bookId": 4
         },
         {
-            "id": 2,
-            "userId": 2,
-            "bookId": 2
+            "id": 5,
+            "userId": 1,
+            "bookId": 1
         }
     ]
 }

@@ -71,8 +71,11 @@ const server = http.createServer((req, res) => {
       }
       // make user if there is no problem
       else {
-        // return the highest value id in data base 
-        const lastId = db.users.reduce((max, book) => book.id > max ? book.id : max, 0);
+        // return the highest value id in data base
+        const lastId = db.users.reduce(
+          (max, book) => (book.id > max ? book.id : max),
+          0
+        );
         const newUser = {
           id: lastId + 1,
           name,
@@ -149,7 +152,6 @@ const server = http.createServer((req, res) => {
       });
     });
   }
-
   // Get list of books
   else if (req.method === "GET" && req.url === "/api/books") {
     fs.readFile("db.json", (err, db) => {
@@ -163,7 +165,84 @@ const server = http.createServer((req, res) => {
       res.end();
     });
   }
+  // Add new book
+  else if (req.method === "POST" && req.url === "/api/books") {
+    let book = "";
 
+    req.on("data", (data) => {
+      book = book + data.toString();
+    });
+    req.on("end", () => {
+      // return the highest value id in data base
+      const lastId = db.books.reduce(
+        (max, book) => (book.id > max ? book.id : max),
+        0
+      );
+      const newBook = {
+        id: lastId + 1,
+        ...JSON.parse(book),
+        free: 1,
+      };
+      db.books.push(newBook);
+      fs.writeFile("db.json", JSON.stringify(db), (err) => {
+        if (err) {
+          throw err;
+        }
+        res.writeHead(201, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "New Book Added successfully" }));
+        res.end();
+      });
+    });
+  } // renting book
+  else if (req.method === "POST" && req.url === "/api/books/rent") {
+    let reqBody = "";
+
+    req.on("data", (data) => {
+      reqBody = reqBody + data.toString();
+    });
+
+    req.on("end", () => {
+      let { userId, bookId } = JSON.parse(reqBody);
+      console.log(bookId);
+
+      const isFreeBook = db.books.some(
+        (book) => book.id === bookId && book.free === 1
+      );
+
+      if (isFreeBook) {
+        db.books.forEach((book) => {
+          if (book.id === Number(bookId)) {
+            book.free = 0;
+          }
+        });
+        // return the highest value id in data base
+        const lastId = db.rents.reduce(
+          (max, book) => (book.id > max ? book.id : max),
+          0
+        );
+        const newRent = {
+          id: lastId + 1,
+          userId,
+          bookId,
+        };
+
+        db.rents.push(newRent);
+
+        fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+          if (err) {
+            throw err;
+          }
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.write(JSON.stringify({ message: "book has rented" }));
+          res.end();
+        });
+      } else {
+        res.writeHead(301, { "Content-Type": "application/json" });
+        res.write(JSON.stringify({ message: "book not available" }));
+        res.end();
+      }
+    });
+  }
   // Delete a book by id
   else if (req.method === "DELETE" && req.url.startsWith("/api/books")) {
     const parseUrl = url.parse(req.url, true);
@@ -198,34 +277,6 @@ const server = http.createServer((req, res) => {
       }
     );
   }
-
-  // Add new book
-  else if (req.method === "POST" && req.url === "/api/books") {
-    let book = "";
-
-    req.on("data", (data) => {
-      book = book + data.toString();
-    });
-    req.on("end", () => {
-      // return the highest value id in data base 
-      const lastId = db.books.reduce((max, book) => book.id > max ? book.id : max, 0);
-      const newBook = {
-        id: lastId + 1,
-        ...JSON.parse(book),
-        free: 1,
-      };
-      db.books.push(newBook);
-      fs.writeFile("db.json", JSON.stringify(db), (err) => {
-        if (err) {
-          throw err;
-        }
-        res.writeHead(201, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: "New Book Added successfully" }));
-        res.end();
-      });
-    });
-  }
-
   // Edit a Book
   else if (req.method === "PUT" && req.url.startsWith("/api/books")) {
     const parseUrl = url.parse(req.url, true);
@@ -269,53 +320,34 @@ const server = http.createServer((req, res) => {
       });
     });
   }
-  // renting book
-  else if (req.method === "POST" && req.url === "/api/books/rent") {
-    let reqBody = "";
+  // return book
+  else if (req.method === "PUT" && req.url.startsWith("/api/books/back")) {
+    const parseUrl = url.parse(req.url, true);
+    const bookId = parseUrl.query.id;
 
-    req.on("data", (data) => {
-      reqBody = reqBody + data.toString();
-    });
+    const newRents = db.rents.filter((rent) => rent.bookId != bookId);
 
-    req.on("end", () => {
-      let { userId, bookId } = JSON.parse(reqBody);
-      console.log(bookId)
+    const book = db.books.find((b) => b.id === Number(bookId));
+    if (book) {
+      book.free = 1;
 
-      const isFreeBook = db.books.some(
-        (book) => book.id === bookId && book.free === 1
-      );
-
-      if (isFreeBook) {
-
-        db.books.forEach(book => {
-          if(book.id === Number(bookId)){
-            book.free = 0;
-          }
-        })
-        // return the highest value id in data base 
-        const lastId = db.rents.reduce((max, book) => book.id > max ? book.id : max, 0);
-        const newRent = {
-          id: lastId + 1,
-          userId,
-          bookId,
-        };
-
-        db.rents.push(newRent);
-
-        fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+      fs.writeFile(
+        "./db.json",
+        JSON.stringify({ ...db, rents: newRents }),
+        (err) => {
           if (err) {
             throw err;
           }
+
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.write(JSON.stringify({ message: "book has rented" }));
+          res.write(JSON.stringify({ message: "book has returned" }));
           res.end();
-        });
-      } else {
-        res.writeHead(301, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: "book not available" }));
-        res.end();
-      }
-    });
+        }
+      );
+    } else {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Book not found" }));
+    }
   }
 });
 

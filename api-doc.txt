@@ -62,5 +62,5 @@ for renting a book :
 POST
 {
     "userId": id,
-    "bookID": id,
+    "bookId": id,
 }
