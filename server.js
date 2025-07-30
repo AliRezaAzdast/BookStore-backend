@@ -3,6 +3,8 @@ const fs = require("fs");
 const url = require("url");
 const db = require("./db.json");
 
+const bookController = require("./controllers/bookController")
+
 const server = http.createServer((req, res) => {
   // Get list of users
   if (req.method === "GET" && req.url === "/api/users") {
@@ -154,16 +156,7 @@ const server = http.createServer((req, res) => {
   }
   // Get list of books
   else if (req.method === "GET" && req.url === "/api/books") {
-    fs.readFile("db.json", (err, db) => {
-      if (err) {
-        throw err;
-      }
-      const data = JSON.parse(db);
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.write(JSON.stringify(data.books));
-      res.end();
-    });
+   bookController.getAll(req, res)
   }
   // Add new book
   else if (req.method === "POST" && req.url === "/api/books") {
@@ -245,37 +238,7 @@ const server = http.createServer((req, res) => {
   }
   // Delete a book by id
   else if (req.method === "DELETE" && req.url.startsWith("/api/books")) {
-    const parseUrl = url.parse(req.url, true);
-    const bookId = parseUrl.query.id;
-
-    // Check if the book with the given id exists
-    const bookExists = db.books.some((book) => book.id == bookId);
-
-    if (!bookExists) {
-      // If not found, return 404 error
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.write(JSON.stringify({ error: "Book not found" }));
-      return res.end();
-    }
-
-    // If found, remove the book from the list
-    const newBooks = db.books.filter((book) => book.id != bookId);
-
-    // Write the updated data back to the file
-    fs.writeFile(
-      "db.json",
-      JSON.stringify({ ...db, books: newBooks }),
-      (err) => {
-        if (err) {
-          throw err;
-        }
-
-        // Return success response
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: "Book removed successfully" }));
-        res.end();
-      }
-    );
+   bookController.removeOne(req,res)
   }
   // Edit a Book
   else if (req.method === "PUT" && req.url.startsWith("/api/books")) {
