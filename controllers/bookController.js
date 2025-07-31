@@ -26,7 +26,25 @@ const removeOne = async (req, res) => {
   }
 };
 
+const addOne = async (req, res) => {
+  let book = "";
+  req.on("data", (data) => {
+    book = book + data.toString();
+  });
+  const lastId = await BookModel.lastId();
+  const newBook = {
+    id: lastId + 1,
+    ...JSON.parse(book),
+    free: 1,
+  };
+  BookModel.add(newBook);
+  res.writeHead(201, { "Content-Type": "application/json" });
+  res.write(JSON.stringify({ message: "New Book Added successfully" }));
+  res.end();
+};
+
 module.exports = {
   getAll,
   removeOne,
+  addOne,
 };

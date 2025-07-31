@@ -46,7 +46,7 @@
             "title": "David Goggins",
             "author": "Can't hurt me",
             "price": 150000,
-            "free": 0
+            "free": 1
         },
         {
             "id": 2,
@@ -68,18 +68,20 @@
             "author": "Dale Carnegie",
             "price": 150000,
             "free": 1
+        },
+        {
+            "id": 5,
+            "title": "the wolf",
+            "author": "k.tolnoe",
+            "price": 30000,
+            "free": 0
         }
     ],
     "rents": [
         {
-            "id": 4,
+            "id": 2,
             "userId": 1,
-            "bookId": 4
-        },
-        {
-            "id": 5,
-            "userId": 1,
-            "bookId": 1
-        }
+            "bookId": 5
+        }   
     ]
 }

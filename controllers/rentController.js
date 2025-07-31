@@ -1,0 +1,62 @@
+const url = require("url");
+const BookModel = require("../models/Book");
+const RentModel = require("../models/Rent");
+
+const rent = async (req, res) => {
+  let reqBody = "";
+
+  req.on("data", (data) => {
+    reqBody = reqBody + data.toString();
+  });
+
+  req.on("end", async () => {
+    let { userId, bookId } = JSON.parse(reqBody);
+
+    const isFreeBook = await BookModel.isFree(bookId);
+    if (isFreeBook) {
+      BookModel.rent(bookId);
+      // return the highest value id in data base
+      const lastId = await RentModel.lastId();
+      const newRent = {
+        id: lastId + 1,
+        userId,
+        bookId,
+      };
+
+      RentModel.rent(newRent);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ message: "book has rented" }));
+      res.end();
+    } else {
+      res.writeHead(301, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ message: "book not available" }));
+      res.end();
+    }
+  });
+};
+
+const returnBook = async (req, res) => {
+  const parseUrl = url.parse(req.url, true);
+  const bookId = parseUrl.query.id;
+
+  const newRents = await RentModel.filter(bookId);
+  const book = await BookModel.findOne(bookId);
+  const rentExists = await RentModel.rentExists(bookId)
+  if (rentExists) {
+    book.free = 1;
+    await RentModel.remove(newRents);
+
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.write(JSON.stringify({ message: "book has returned" }));
+    res.end();
+  } else {
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "rented Book not found" }));
+  }
+};
+
+module.exports = {
+  rent,
+  returnBook,
+};
