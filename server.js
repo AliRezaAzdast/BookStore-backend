@@ -5,20 +5,12 @@ const db = require("./db.json");
 
 const bookController = require("./controllers/bookController");
 const rentController = require("./controllers/rentController");
+const userController = require('./controllers/usersController')
 
 const server = http.createServer((req, res) => {
   // Get list of users
   if (req.method === "GET" && req.url === "/api/users") {
-    fs.readFile("db.json", (err, db) => {
-      if (err) {
-        throw err;
-      }
-      const data = JSON.parse(db);
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.write(JSON.stringify(data.users));
-      res.end();
-    });
+   userController.getAll(req, res)
   }
   // for user login
   else if (req.method === "POST" && req.url === "/api/users/login") {
@@ -177,46 +169,7 @@ const server = http.createServer((req, res) => {
   }
   // Edit a Book
   else if (req.method === "PUT" && req.url.startsWith("/api/books")) {
-    const parseUrl = url.parse(req.url, true);
-    const bookId = parseUrl.query.id;
-
-    let bookNewInfo = "";
-
-    // Check if the book with the given id exists
-    const bookExists = db.books.some((book) => book.id == bookId);
-
-    if (!bookExists) {
-      // If not found, return 404 error
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.write(JSON.stringify({ error: "Book not found" }));
-      return res.end();
-    }
-
-    req.on("data", (data) => {
-      bookNewInfo = bookNewInfo + data.toString();
-    });
-
-    req.on("end", () => {
-      const reqBody = JSON.parse(bookNewInfo);
-
-      db.books.forEach((book) => {
-        if (book.id === Number(bookId)) {
-          book.title = reqBody.title;
-          book.author = reqBody.author;
-          book.price = reqBody.price;
-        }
-      });
-
-      fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-        if (err) {
-          throw err;
-        }
-
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.write(JSON.stringify({ message: "book change successfully" }));
-        res.end();
-      });
-    });
+    bookController.editBook(req, res);
   }
 });
 

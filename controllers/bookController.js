@@ -2,7 +2,7 @@ const url = require("url");
 const BookModel = require("../models/Book");
 
 const getAll = async (req, res) => {
-  const book = await BookModel.find();
+  const book = await BookModel.findAll();
 
   res.writeHead(200, { "Content-Type": "application/json" });
   res.write(JSON.stringify(book));
@@ -43,8 +43,36 @@ const addOne = async (req, res) => {
   res.end();
 };
 
+const editBook = async (req, res) => {
+  const parseUrl = url.parse(req.url, true);
+  const bookId = parseUrl.query.id;
+
+  let bookNewInfo = "";
+
+  req.on("data", (data) => {
+    bookNewInfo = bookNewInfo + data.toString();
+  });
+
+  const bookExists = await BookModel.bookExists(bookId);
+  if (!bookExists) {
+    // If not found, return 404 error
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.write(JSON.stringify({ error: "Book not found" }));
+    return res.end();
+  }
+
+  req.on("end", () => {
+    const reqBody = JSON.parse(bookNewInfo);
+    BookModel.editBook(bookId, reqBody);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.write(JSON.stringify({ message: "book change successfully" }));
+    res.end();
+  });
+};
+
 module.exports = {
   getAll,
   removeOne,
   addOne,
+  editBook,
 };
