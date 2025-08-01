@@ -5,7 +5,7 @@
             "name": "Qadir Yolme",
             "username": "Q_Yolme",
             "gmail": "test@gmail.com",
-            "crime": 0,
+            "crime": 1000,
             "role": "ADMIN"
         },
         {
@@ -21,23 +21,8 @@
             "name": "Ali reza",
             "username": "Azdast",
             "gmail": "azdast47@gmail.com",
+            "crime": 20000,
             "role": "ADMIN"
-        },
-        {
-            "id": 6,
-            "name": "ali",
-            "username": "a",
-            "gmail": "azdast49@gmail.com",
-            "crime": 0,
-            "role": "USER"
-        },
-        {
-            "id": 7,
-            "name": "sepehr",
-            "username": "king",
-            "gmail": "king@gmail.com",
-            "crime": 0,
-            "role": "USER"
         }
     ],
     "books": [
