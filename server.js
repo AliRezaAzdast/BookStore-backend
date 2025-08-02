@@ -1,7 +1,6 @@
 const http = require("http");
-const fs = require("fs");
-const url = require("url");
-const db = require("./db.json");
+require('dotenv').config()
+console.log(process.env.PORT)
 
 const bookController = require("./controllers/bookController");
 const rentController = require("./controllers/rentController");
@@ -58,6 +57,6 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(3000, () => {
-  console.log("Server is running on port 3000");
+server.listen(process.env.PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}`);
 });
