@@ -53,19 +53,20 @@ const editBook = async (req, res) => {
     bookNewInfo = bookNewInfo + data.toString();
   });
 
-  const bookExists = await BookModel.bookExists(bookId);
-  if (!bookExists) {
-    // If not found, return 404 error
-    res.writeHead(404, { "Content-Type": "application/json" });
-    res.write(JSON.stringify({ error: "Book not found" }));
-    return res.end();
-  }
-
-  req.on("end", () => {
+  req.on("end", async () => {
     const reqBody = JSON.parse(bookNewInfo);
-    BookModel.editBook(bookId, reqBody);
+    const bookExists = await BookModel.bookExists(bookId);
+
+    if (!bookExists) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.write(JSON.stringify({ error: "Book not found" }));
+      return res.end();
+    }
+
+    await BookModel.updateBook(bookId, reqBody);
+
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.write(JSON.stringify({ message: "book change successfully" }));
+    res.write(JSON.stringify({ message: "book changed successfully" }));
     res.end();
   });
 };

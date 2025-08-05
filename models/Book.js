@@ -1,17 +1,26 @@
-const db = require("../db.json");
+// const db = require("../db.json");
 const fs = require("fs");
-const rentModel = require("./../models/Rent");
+const { dbConnection } = require("./../configs/db");
+const { ObjectId } = require("mongodb");
 
-const findAll = () => {
-  return new Promise((resolve, reject) => {
-    resolve(db.books);
-  });
+const findAll = async () => {
+  const db = await dbConnection();
+  const booksCollection = db.collection("books");
+  const books = booksCollection.find({}).toArray();
+  return books;
+  // return new Promise((resolve, reject) => {
+  //   resolve(db.books);
+  // });
 };
 
-const bookExists = (bookId) => {
-  return new Promise((resolve, reject) => {
-    resolve(db.books.some((book) => book.id == bookId));
-  });
+const bookExists = async (bookId) => {
+  const db = await dbConnection();
+  const booksCollection = db.collection("books");
+  const bookExist = (await booksCollection.findOne({ _id: new ObjectId(bookId) })) !== null;
+  return bookExist;
+  // return new Promise((resolve, reject) => {
+  //   resolve(db.books.some((book) => book.id == bookId));
+  // });
 };
 
 const remove = (bookId) => {
@@ -72,23 +81,37 @@ const findOne = (bookId) => {
   });
 };
 
-const editBook = (bookId, body) => {
-  return new Promise((resolve, reject) => {
+const updateBook = async (bookId, body) => {
+  const db = await dbConnection();
+  const booksCollection = db.collection("books");
+  const {title,author,price} = body
+  const updateBook = await booksCollection.findOneAndUpdate(
+    { _id: new ObjectId(bookId) },
+    {
+      $set: {
+        title,
+        author,
+        price
+      },
+    }
+  );
+  return updateBook;
 
-    db.books.forEach((book) => {
-      if (book.id === Number(bookId)) {
-        book.title = body.title;
-        book.author = body.author;
-        book.price = body.price;
-      }
-    });
+  // return new Promise((resolve, reject) => {
+  //   db.books.forEach((book) => {
+  //     if (book.id === Number(bookId)) {
+  //       book.title = body.title;
+  //       book.author = body.author;
+  //       book.price = body.price;
+  //     }
+  //   });
 
-    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-  });
+  //   fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+  //     if (err) {
+  //       throw err;
+  //     }
+  //   });
+  // });
 };
 
 module.exports = {
@@ -100,5 +123,5 @@ module.exports = {
   isFree,
   rent,
   findOne,
-  editBook,
+  updateBook,
 };
