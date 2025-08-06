@@ -16,9 +16,8 @@ const rent = async (req, res) => {
     if (isFreeBook) {
       BookModel.rent(bookId);
       // return the highest value id in data base
-      const lastId = await RentModel.lastId();
+
       const newRent = {
-        id: lastId + 1,
         userId,
         bookId,
       };
@@ -40,12 +39,11 @@ const returnBook = async (req, res) => {
   const parseUrl = url.parse(req.url, true);
   const bookId = parseUrl.query.id;
 
-  const newRents = await RentModel.filter(bookId);
-  const book = await BookModel.findOne(bookId);
-  const rentExists = await RentModel.rentExists(bookId)
+
+  const rentExists = await RentModel.rentExists(bookId);
   if (rentExists) {
-    book.free = 1;
-    await RentModel.remove(newRents);
+    await BookModel.returnBook(bookId)
+    await RentModel.remove(bookId);
 
     res.writeHead(200, { "Content-Type": "application/json" });
     res.write(JSON.stringify({ message: "book has returned" }));

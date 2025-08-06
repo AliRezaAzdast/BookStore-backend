@@ -1,56 +1,55 @@
 const db = require("../db.json");
 const fs = require("fs");
+const { dbConnection } = require("./../configs/db");
+const { ObjectId } = require("mongodb");
 
-const lastId = () => {
-  return new Promise((resolve, reject) => {
-    resolve(db.rents.reduce((max, book) => (book.id > max ? book.id : max), 0));
+// const lastId = () => {
+//   return new Promise((resolve, reject) => {
+//     resolve(db.rents.reduce((max, book) => (book.id > max ? book.id : max), 0));
+//   });
+// };
+
+const rent = async (newRent) => {
+  const db = await dbConnection();
+  const rentCollection = db.collection("rent");
+  const { userId, bookId } = newRent;
+  const addOne = rentCollection.insertOne({
+    userId,
+    bookId,
   });
+  return addOne;
+
+  // return new Promise((resolve, reject) => {
+  //   db.rents.push(newRent);
+
+  //   fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+  //     if (err) {
+  //       throw err;
+  //     }
+  //   });
+  // });
 };
 
-const rent = (newRent) => {
-  return new Promise((resolve, reject) => {
-    db.rents.push(newRent);
 
-    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-  });
+const remove = async (bookId) => {
+  const db = await dbConnection();
+  const rentCollection = db.collection("rent");
+  const removeOne = rentCollection.deleteOne({bookId})
 };
 
-const filter = (rentId) => {
-  return new Promise((resolve, reject) => {
-    resolve(db.rents.filter((rent) => rent.bookId != Number(rentId)));
-  });
-};
-
-const remove = (body) => {
-  return new Promise((resolve, reject) => {
-    resolve(
-      fs.writeFile(
-        "./db.json",
-        JSON.stringify({ ...db, rents: body }),
-        (err) => {
-          if (err) {
-            throw err;
-          }
-        }
-      )
-    );
-  });
-};
-
-const rentExists = (bookId) => {
-  return new Promise((resolve, reject) => {
-    resolve(db.rents.some((rent) => rent.bookId == bookId));
-  });
+const rentExists = async (bookId) => {
+  const db = await dbConnection();
+  const rentCollection = db.collection("rent");
+  const result = !!(await rentCollection.findOne({bookId}))
+  return result
+  // return new Promise((resolve, reject) => {
+  //   resolve(db.rents.some((rent) => rent.bookId == bookId));
+  // });
 };
 
 module.exports = {
-  lastId,
+  // lastId,
   rent,
-  filter,
   remove,
-  rentExists
+  rentExists,
 };
