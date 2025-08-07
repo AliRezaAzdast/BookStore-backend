@@ -1,114 +1,167 @@
 const db = require("../db.json");
 const fs = require("fs");
+const { dbConnection } = require("./../configs/db");
+const { ObjectId } = require("mongodb");
 
-const findAll = () => {
-  return new Promise((resolve, reject) => {
-    resolve(db.users);
-  });
+const findAll = async () => {
+  const db = await dbConnection();
+  const usersCollection = db.collection("users");
+  const result = usersCollection.find({}).toArray();
+  return result;
+  // return new Promise((resolve, reject) => {
+  //   resolve(db.users);
+  // });
 };
 
-const findByUsernameAndGmail = (username, gmail) => {
-  return new Promise((resolve, reject) => {
-    const mainUser = db.users.find(
-      (user) => user.username === username && user.gmail === gmail
-    );
-    resolve(mainUser);
+const findByUsernameAndGmail = async (username, gmail) => {
+  const db = await dbConnection();
+  const usersCollection = db.collection("users");
+  const result = usersCollection.findOne({
+    username: username,
+    gmail: gmail,
   });
-};
-const isUserExist = (username, gmail) => {
-  return new Promise((resolve, reject) => {
-    const isUserExist = db.users.find(
-      (user) => user.username === username || user.gmail === gmail
-    );
-    resolve(isUserExist);
-  });
-};
-const isUserExistById = (userId) => {
-  return new Promise((resolve, reject) => {
-    const isUserExist = db.users.find((user) => user.id === Number(userId));
-    resolve(isUserExist);
-  });
+  return result;
+  // return new Promise((resolve, reject) => {
+  //   const mainUser = db.users.find(
+  //     (user) => user.username === username && user.gmail === gmail
+  //   );
+  //   resolve(mainUser);
+  // });
 };
 
-const lastId = () => {
-  return new Promise((resolve, reject) => {
-    const lastId = db.users.reduce(
-      (max, book) => (book.id > max ? book.id : max),
-      0
-    );
-    resolve(lastId);
-  });
+const isUserExist = async (username, gmail) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  const result = !!(await usersCollection.findOne({
+    username,
+    gmail
+  }))
+  console.log(result)
+  return result;
+  // return new Promise((resolve, reject) => {
+  //   const isUserExist = db.users.find(
+  //     (user) => user.username === username || user.gmail === gmail
+  //   );
+  //   resolve(isUserExist);
+  // });
 };
 
-const createUser = (user) => {
-  return new Promise((resolve, reject) => {
-    db.users.push(user);
-    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-      if (err) {
-        throw reject(err);
-      }
-      resolve();
-    });
-  });
+const isUserExistById = async (userId) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  const result = !!(await usersCollection.findOne({_id: new ObjectId(userId)}))
+  return result
+  // return new Promise((resolve, reject) => {
+  //   const isUserExist = db.users.find((user) => user.id === Number(userId));
+  //   resolve(isUserExist);
+  // });
 };
 
-const deleteUser = (userId) => {
-  return new Promise((resolve, reject) => {
-    const newUser = db.users.filter((user) => user.id != userId);
+// const lastId = () => {
+//   return new Promise((resolve, reject) => {
+//     const lastId = db.users.reduce(
+//       (max, book) => (book.id > max ? book.id : max),
+//       0
+//     );
+//     resolve(lastId);
+//   });
+// };
 
-    // Write the updated data back to the file
-    fs.writeFile(
-      "db.json",
-      JSON.stringify({ ...db, users: newUser }),
-      (err) => {
-        if (err) {
-          throw reject(err);
-        }
-        resolve();
-      }
-    );
-  });
+const createUser = async (user) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  await usersCollection.insertOne({
+    ...user,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  })
+  // return new Promise((resolve, reject) => {
+  //   db.users.push(user);
+  //   fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+  //     if (err) {
+  //       throw reject(err);
+  //     }
+  //     resolve();
+  //   });
+  // });
 };
 
-const makeAdmin = (userId) => {
-  return new Promise((resolve, reject) => {
-    db.users.forEach((user) => {
-      if (user.id === Number(userId)) {
-        user.role = "ADMIN";
-      }
-    });
+const deleteUser = async (userId) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  await usersCollection.deleteOne({_id: new ObjectId(userId)})
 
-    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-      if (err) {
-        throw reject(err);
-      }
-      resolve();
-    });
-  });
+  // return new Promise((resolve, reject) => {
+  //   const newUser = db.users.filter((user) => user.id != userId);
+
+  //   // Write the updated data back to the file
+  //   fs.writeFile(
+  //     "db.json",
+  //     JSON.stringify({ ...db, users: newUser }),
+  //     (err) => {
+  //       if (err) {
+  //         throw reject(err);
+  //       }
+  //       resolve();
+  //     }
+  //   );
+  // });
 };
 
-const updateUserCrime = (userId, crime) => {
-  return new Promise((resolve, reject) => {
-    db.users.forEach((user) => {
-      if (user.id === Number(userId)) {
-        user.crime = crime;
-      }
-    });
+const makeAdmin = async (userId) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  await usersCollection.updateOne({_id: new ObjectId(userId)}, {
+    $set:{
+      role: "ADMIN"
+    }
+  })
+  // return new Promise((resolve, reject) => {
+  //   db.users.forEach((user) => {
+  //     if (user.id === Number(userId)) {
+  //       user.role = "ADMIN";
+  //     }
+  //   });
 
-    fs.writeFile("./db.json", JSON.stringify(db), (err) => {
-      if (err) {
-        throw reject(err);
-      }
-      resolve();
-    });
-  });
+  //   fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+  //     if (err) {
+  //       throw reject(err);
+  //     }
+  //     resolve();
+  //   });
+  // });
 };
+
+const updateUserCrime = async (userId, crime) => {
+  const db = await dbConnection()
+  const usersCollection = db.collection('users')
+  await usersCollection.updateOne({_id: new ObjectId(userId)}, {
+    $set:{
+      crime: crime
+    }
+  })
+  // return new Promise((resolve, reject) => {
+  //   db.users.forEach((user) => {
+  //     if (user.id === Number(userId)) {
+  //       user.crime = crime;
+  //     }
+  //   });
+
+  //   fs.writeFile("./db.json", JSON.stringify(db), (err) => {
+  //     if (err) {
+  //       throw reject(err);
+  //     }
+  //     resolve();
+  //   });
+  // });
+};
+
 module.exports = {
   findAll,
   findByUsernameAndGmail,
   isUserExist,
   isUserExistById,
-  lastId,
+  // lastId,
   createUser,
   deleteUser,
   makeAdmin,

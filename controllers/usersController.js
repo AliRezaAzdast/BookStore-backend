@@ -18,7 +18,7 @@ const login = async (req, res) => {
   req.on("end", async () => {
     const { username, gmail } = JSON.parse(user);
     const mainUser = await userModels.findByUsernameAndGmail(username, gmail);
-
+    console.log(mainUser)
     if (mainUser) {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.write(JSON.stringify({ message: "User has logedin" }));
@@ -55,9 +55,8 @@ const register = async (req, res) => {
     // make user if there is no problem
     else {
       // return the highest value id in data base
-      const lastId = await userModels.lastId();
+
       const newUser = {
-        id: lastId + 1,
         name,
         username,
         gmail,
